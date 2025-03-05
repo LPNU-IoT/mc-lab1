@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding-top: 50px;
+      }
+      .button {
+        padding: 15px 30px;
+        font-size: 20px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ESP Web Interface</h1>
+    <button class="button" onclick="sendRequest()">Hold me</button>
+
+    <script>
+      function sendRequest() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/button_press", true);
+        xhr.send();
+      }
+    </script>
+  </body>
+</html>
