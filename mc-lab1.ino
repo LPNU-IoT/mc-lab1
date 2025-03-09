@@ -11,9 +11,9 @@ const char *password = "domestos1216";
 
 const uint8_t btnGPIO = 13;
 
-const uint8_t LED1GPIO = 0;
-const uint8_t LED2GPIO = 14;
-const uint8_t LED3GPIO = 12;
+const uint8_t LED1GPIO = 0;  // red
+const uint8_t LED2GPIO = 14; // green
+const uint8_t LED3GPIO = 12; // white
 
 const uint8_t defaulLED[] = {LED1GPIO, LED2GPIO, LED3GPIO};
 const uint8_t algolLED[] = {LED3GPIO, LED2GPIO, LED1GPIO, LED2GPIO, LED3GPIO};
@@ -103,20 +103,12 @@ void buttonHold()
   }
 }
 
-// if (algoBlink)
-// {
-//   Serial.println("true");
-// }
-
 void setup()
 {
   Serial.begin(115200);
   pinsSetup();
 
-  // initLedsArray();
-  // attachInterrupt(digitalPinToInterrupt(btnGPIO), ISRbtnChange, CHANGE);
-  // timestamp = millis();
-  initWiFi();
+   initWiFi();
 }
 
 void do_algorithm()
@@ -130,10 +122,8 @@ void do_algorithm()
         currentDelay = millis();
         digitalWrite(algolLED[i], HIGH);
 
-        if (i > 0)
-        {
-          digitalWrite(algolLED[i - 1], LOW);
-        }
+        digitalWrite(algolLED[i - 1], LOW);
+        Serial.println("algo blink");
       }
     }
   }
@@ -146,10 +136,8 @@ void do_algorithm()
         currentDelay = millis();
         digitalWrite(defaulLED[e], HIGH);
 
-        if (e > 0)
-        {
-          digitalWrite(defaulLED[e - 1], LOW);
-        }
+        digitalWrite(defaulLED[e - 1], LOW);
+        Serial.println("gefault blink");
       }
     }
   }
@@ -157,6 +145,7 @@ void do_algorithm()
 
 void loop()
 {
+
   buttonHold();
   do_algorithm();
 }
