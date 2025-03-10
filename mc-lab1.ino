@@ -27,6 +27,52 @@ uint32_t lastHoldTime = 0;
 uint32_t currentDelay = 0;
 uint32_t blinkTime = 1000;
 
+const char index_html[] PROGMEM = R"rawliteral(
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding-top: 50px;
+        }
+        .button {
+          padding: 15px 30px;
+          font-size: 20px;
+          color: white;
+          background-color: #007bff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .button:hover {
+          background-color: #0056b3;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>ESP Web Interface</h1>
+      <button class="button" onclick="sendRequest()">Hold me</button>
+  
+      <script>
+        function sendRequest() {
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET", "/button_press", true);
+          xhr.send();
+        }
+      </script>
+    </body>
+  </html>
+  
+  )rawliteral";
+
+void notFound(AsyncWebServerRequest *request)
+{
+  request->send(404, "text/plain", "Not found");
+}
+
 void pinsSetup()
 {
   pinMode(btnGPIO, INPUT);
@@ -108,39 +154,52 @@ void setup()
   Serial.begin(115200);
   pinsSetup();
 
-   initWiFi();
+  initWiFi();
 }
+
+uint8_t currentLED = 0; 
 
 void do_algorithm()
 {
-  if (algoBlink)
-  {
-    for (int i = 0; i < sizeof(algolLED) / sizeof(algolLED[0]); i++)
+    if (millis() - currentDelay >= blinkTime)
     {
-      if (millis() - currentDelay >= blinkTime)
-      {
         currentDelay = millis();
-        digitalWrite(algolLED[i], HIGH);
 
-        digitalWrite(algolLED[i - 1], LOW);
-        Serial.println("algo blink");
-      }
-    }
-  }
-  else
-  {
-    for (int e = 0; e < sizeof(defaulLED) / sizeof(defaulLED[0]); e++)
-    {
-      if (millis() - currentDelay >= blinkTime)
-      {
-        currentDelay = millis();
-        digitalWrite(defaulLED[e], HIGH);
+        if (algoBlink)
+        {
+            if (currentLED > 0)
+            {
+                digitalWrite(algolLED[currentLED - 1], LOW);
+            }
+            else
+            {
+                digitalWrite(algolLED[sizeof(algolLED) / sizeof(algolLED[0]) - 1], LOW);
+            }
 
-        digitalWrite(defaulLED[e - 1], LOW);
-        Serial.println("gefault blink");
-      }
+            digitalWrite(algolLED[currentLED], HIGH);
+            Serial.println(currentLED);
+            Serial.println("algo blink");
+
+            currentLED = (currentLED + 1) % (sizeof(algolLED) / sizeof(algolLED[0]));
+        }
+        else
+        {
+            if (currentLED > 0)
+            {
+                digitalWrite(defaulLED[currentLED - 1], LOW);
+            }
+            else
+            {
+                digitalWrite(defaulLED[sizeof(defaulLED) / sizeof(defaulLED[0]) - 1], LOW);
+            }
+
+            digitalWrite(defaulLED[currentLED], HIGH);
+            Serial.println(currentLED);
+            Serial.println("gefault blink");
+
+            currentLED = (currentLED + 1) % (sizeof(defaulLED) / sizeof(defaulLED[0]));
+        }
     }
-  }
 }
 
 void loop()
