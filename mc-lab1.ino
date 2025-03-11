@@ -21,12 +21,14 @@ const uint8_t algolLED[] = {LED3GPIO, LED2GPIO, LED1GPIO, LED2GPIO, LED3GPIO};
 bool btnHold = false;
 bool isPressBtn = false;
 bool algoBlink = false;
+bool siteBtnPressed = false;
+bool isSiteBtnHold = false;
 
 uint32_t lastHoldTime = 0;
 uint32_t currentDelay = 0;
 uint32_t blinkTime = 1000;
+uint32_t lastClickTime = 0;
 
-bool siteBtnPressed = false;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -113,12 +115,44 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 
     <script>
+let isHolding = false;
 
-        function algorighm1(x) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/" + x, true);
-            xhr.send();
-        }
+function algorighm1(x) {
+    if ((x === 'on_alg1' && isHolding) || (x === 'off_alg1' && !isHolding)) {
+        return; 
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/" + x, true);
+    xhr.send();
+
+    isHolding = (x === 'on_alg1');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const button = document.querySelector('.button');
+
+    button.addEventListener('mousedown', function (event) {
+        event.preventDefault();
+        algorighm1('on_alg1');
+    });
+
+    button.addEventListener('mouseup', function (event) {
+        event.preventDefault();
+        algorighm1('off_alg1');
+    });
+
+    button.addEventListener('touchstart', function (event) {
+        event.preventDefault();
+        algorighm1('on_alg1');
+    });
+
+    button.addEventListener('touchend', function (event) {
+        event.preventDefault();
+        algorighm1('off_alg1');
+    });
+});
+
     </script>
 </body>
 
@@ -185,14 +219,15 @@ uint8_t initWiFi()
 
   server.on("/on_alg1", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-    algoBlink = true;
-    Serial.println("site bnt true");
+    siteBtnPressed = true;
+    //Serial.println("site bnt true");
     request->send(200, "text/plain", "ok"); });
 
   server.on("/off_alg1", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-    algoBlink = false;
-    Serial.println("site bnt false");
+    siteBtnPressed = false;
+
+    //Serial.println("site bnt false");
 
     request->send(200, "text/plain", "ok"); });
 
@@ -226,6 +261,32 @@ void buttonHold()
   }
 }
 
+void siteBtnHold()
+{
+    static bool wasHeld = false;
+
+    if (siteBtnPressed)
+    {
+        if (!isSiteBtnHold)
+        {
+            lastClickTime = millis();
+            isSiteBtnHold = true;
+            Serial.println("site btn is press");
+        }
+
+        if (millis() - lastClickTime >= HOLD_TIME && !wasHeld)
+        {
+            algoBlink = !algoBlink;
+            Serial.println("site btn is held");
+            wasHeld = true;  
+        }
+    }
+    else
+    {
+        isSiteBtnHold = false;
+        wasHeld = false;  
+    }
+}
 
 
 void setup()
