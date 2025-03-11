@@ -22,7 +22,6 @@ bool btnHold = false;
 bool isPressBtn = false;
 bool algoBlink = false;
 bool siteBtnPressed = false;
-bool isSiteBtnHold = false;
 
 const uint8_t defaulLED[] = {LED1GPIO, LED2GPIO, LED3GPIO};
 const uint8_t algolLED[] = {LED3GPIO, LED2GPIO, LED1GPIO, LED2GPIO, LED3GPIO};
@@ -89,4 +88,5 @@ void loop()
 {
     buttonHold();
     do_algorithm();
+    checkSiteBtn();
 }

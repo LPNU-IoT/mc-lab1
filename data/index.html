@@ -74,17 +74,17 @@
 <body>
     <h1>ESP Pushbutton Web Server</h1>
     <!-- onmousedown / onmouseup - on PC/Laptop, ontouchend / ontouchstart - on mobile -->
-    <button class="button" onmousedown="algorighm1('on_alg1');" ontouchstart="algorighm1('on_alg1');"
-        onmouseup="algorighm1('off_alg1');" ontouchend="algorighm1('off_alg1');">Algorithm 1</button>
+<button class="button" onclick="algorighm1();">Click me</button>
 
 
-    <script>
 
-        function algorighm1(x) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/" + x, true);
-            xhr.send();
-        }
+<script>
+
+    function algorighm1(x) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/" + x, true);
+        xhr.send();
+    }
     </script>
 </body>
 

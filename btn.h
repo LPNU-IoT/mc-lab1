@@ -38,31 +38,17 @@ void buttonHold()
     }
 }
 
-void siteBtnHold()
+void checkSiteBtn()
 {
-    static bool wasHeld = false;
+    static bool lastState = false;
 
-    if (siteBtnPressed)
+    if (siteBtnPressed && !lastState)
     {
-        if (!isSiteBtnHold)
-        {
-            lastClickTime = millis();
-            isSiteBtnHold = true;
-            Serial.println("site btn is press");
-        }
+        algoBlink = !algoBlink;
+        Serial.println(algoBlink ? "Algorithm mode activated" : "Default mode activated");
+    }
 
-        if (millis() - lastClickTime >= HOLD_TIME && !wasHeld)
-        {
-            algoBlink = !algoBlink;
-            Serial.println("site btn is held");
-            wasHeld = true;
-        }
-    }
-    else
-    {
-        isSiteBtnHold = false;
-        wasHeld = false;
-    }
+    lastState = siteBtnPressed;
 }
 
 #endif

@@ -78,50 +78,19 @@ const char index_html[] PROGMEM = R"rawliteral(
     <body>
         <h1>ESP Pushbutton Web Server</h1>
         <!-- onmousedown / onmouseup - on PC/Laptop, ontouchend / ontouchstart - on mobile -->
-        <button class="button" onmousedown="algorighm1('on_alg1');" ontouchstart="algorighm1('on_alg1');"
-            onmouseup="algorighm1('off_alg1');" ontouchend="algorighm1('off_alg1');">Algorithm 1</button>
-    
-    
-        <script>
-    let isHolding = false;
-    
-    function algorighm1(x) {
-        if ((x === 'on_alg1' && isHolding) || (x === 'off_alg1' && !isHolding)) {
-            return; 
-        }
-        
+<button class="button" onclick="algorighm1();">Click me</button>
+
+
+
+<script>
+    let isOn = false;
+    function algorighm1() {
+        isOn = !isOn; 
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/" + x, true);
+        xhr.open("GET", isOn ? "/on_alg1" : "/off_alg1", true);
         xhr.send();
-    
-        isHolding = (x === 'on_alg1');
     }
-    
-    document.addEventListener('DOMContentLoaded', function () {
-        const button = document.querySelector('.button');
-    
-        button.addEventListener('mousedown', function (event) {
-            event.preventDefault();
-            algorighm1('on_alg1');
-        });
-    
-        button.addEventListener('mouseup', function (event) {
-            event.preventDefault();
-            algorighm1('off_alg1');
-        });
-    
-        button.addEventListener('touchstart', function (event) {
-            event.preventDefault();
-            algorighm1('on_alg1');
-        });
-    
-        button.addEventListener('touchend', function (event) {
-            event.preventDefault();
-            algorighm1('off_alg1');
-        });
-    });
-    
-        </script>
+    </script>
     </body>
     
     </html>

@@ -9,11 +9,11 @@ AsyncWebServer server(80); // Порт 80 для HTTP-з'єднання
 #endif
 
 #ifndef SSID
-#define SSID "611VVA"
+#define SSID "admin"
 #endif
 
 #ifndef PASSWORD
-#define PASSWORD "123qwerty9"
+#define PASSWORD "domestos1216"
 #endif
 
 extern bool siteBtnPressed;
