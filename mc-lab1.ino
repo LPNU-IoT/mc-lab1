@@ -20,58 +20,116 @@ const uint8_t algolLED[] = {LED3GPIO, LED2GPIO, LED1GPIO, LED2GPIO, LED3GPIO};
 
 bool btnHold = false;
 bool isPressBtn = false;
-bool siteBtnHold = false;
 bool algoBlink = false;
 
 uint32_t lastHoldTime = 0;
 uint32_t currentDelay = 0;
 uint32_t blinkTime = 1000;
 
+bool siteBtnPressed = false;
+
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
+
 const char index_html[] PROGMEM = R"rawliteral(
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
         body {
-          font-family: Arial, sans-serif;
-          text-align: center;
-          padding-top: 50px;
+            font-family: Arial;
+            text-align: center;
+            margin: 0px auto;
+            padding-top: 30px;
         }
+
         .button {
-          padding: 15px 30px;
-          font-size: 20px;
-          color: white;
-          background-color: #007bff;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
+            padding: 10px 20px;
+            font-size: 24px;
+            text-align: center;
+            outline: none;
+            color: #fff;
+            background-color: #2f4468;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 6px #999;
+            cursor: pointer;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         }
+
         .button:hover {
-          background-color: #0056b3;
+            background-color: #1f2e45
         }
-      </style>
-    </head>
-    <body>
-      <h1>ESP Web Interface</h1>
-      <button class="button" onclick="sendRequest()">Hold me</button>
-  
-      <script>
-        function sendRequest() {
-          var xhr = new XMLHttpRequest();
-          xhr.open("GET", "/button_press", true);
-          xhr.send();
+
+        .button:active {
+            background-color: #1f2e45;
+            box-shadow: 0 4px #666;
+            transform: translateY(2px);
         }
-      </script>
-    </body>
-  </html>
-  
-  )rawliteral";
+
+        .leds {
+            width: 100px;
+            height: 100px;
+            margin: 20px;
+            display: inline-block;
+            border: 5px solid black;
+            border-radius: 50%;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        #led1 {
+            background-color: white;
+        }
+
+        @media screen and (max-width: 480px) {
+            .leds {
+                width: 50px;
+                height: 50px;
+            }
+
+            .button {
+                padding: 15px 100px 15px 10px;
+                font-size: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+                padding-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>ESP Pushbutton Web Server</h1>
+    <!-- onmousedown / onmouseup - on PC/Laptop, ontouchend / ontouchstart - on mobile -->
+    <button class="button" onmousedown="algorighm1('on_alg1');" ontouchstart="algorighm1('on_alg1');"
+        onmouseup="algorighm1('off_alg1');" ontouchend="algorighm1('off_alg1');">Algorithm 1</button>
+
+
+    <script>
+
+        function algorighm1(x) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/" + x, true);
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>
+)rawliteral";
 
 void notFound(AsyncWebServerRequest *request)
 {
   request->send(404, "text/plain", "Not found");
 }
+
 
 void pinsSetup()
 {
@@ -122,6 +180,25 @@ uint8_t initWiFi()
     Serial.println("Wifi of");
     return -1;
   }
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send_P(200, "text/html", index_html); });
+
+  server.on("/on_alg1", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    algoBlink = true;
+    Serial.println("site bnt true");
+    request->send(200, "text/plain", "ok"); });
+
+  server.on("/off_alg1", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    algoBlink = false;
+    Serial.println("site bnt false");
+
+    request->send(200, "text/plain", "ok"); });
+
+
+  server.onNotFound(notFound);
+  server.begin();    
 
   return 0;
 }
@@ -148,6 +225,8 @@ void buttonHold()
     btnHold = false;
   }
 }
+
+
 
 void setup()
 {
@@ -204,7 +283,6 @@ void do_algorithm()
 
 void loop()
 {
-
   buttonHold();
   do_algorithm();
 }
