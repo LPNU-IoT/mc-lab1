@@ -16,6 +16,8 @@ AsyncWebServer server(80); // Порт 80 для HTTP-з'єднання
 #define PASSWORD "domestos1216"
 #endif
 
+#define HOST_NAME "lvivske1715"
+
 extern bool siteBtnPressed;
 void notFound(AsyncWebServerRequest *request);
 
@@ -82,6 +84,15 @@ uint8_t initWiFi()
 void notFound(AsyncWebServerRequest *request)
 {
     request->send(404, "text/plain", "Not found");
+}
+
+void InitMDNS()
+{
+    if (!MDNS.begin(HOST_NAME))
+    {
+        Serial.println("Error starting mDNS");
+    }
+    Serial.println("mDNS started");
 }
 
 #endif

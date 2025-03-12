@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <WiFiClient.h>
@@ -43,8 +44,8 @@ void setup()
 {
     Serial.begin(115200);
     pinsSetup();
-
     initWiFi();
+    InitMDNS();
 }
 
 uint8_t currentLED = 0;
@@ -86,6 +87,7 @@ void do_algorithm()
 
 void loop()
 {
+    MDNS.update();
     buttonHold();
     do_algorithm();
     checkSiteBtn();
